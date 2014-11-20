@@ -3,6 +3,15 @@ var spy = 2;
 var missionSizes = [2,3,2,3,3];
 var maxVoteFails = 5;
 
+function History() {
+  // missions successes and fails
+  this.missionSuccesses = []; // e.g. [true, false];
+  this.missionTeams = [];
+  this.currentMissionNum = function() {
+    return this.missionSuccesses.length;
+  }
+}
+
 function Player(isGood) {
   this.playerNum = 0; // will be changed later
   this.toString = function(){
@@ -11,7 +20,8 @@ function Player(isGood) {
   };
   // return an array of player indices, of
   // apprporiate size
-  this.leaderChooseTeam = function(missNum) {
+  this.leaderChooseTeam = function(history) {
+    var missNum = history.currentMissionNum();
     var size = missionSizes[missNum];
     var team = [];
     var playerIndices = [0, 1, 2, 3, 4];
@@ -63,6 +73,7 @@ function shuffle(arr) {
 
 // Return true if good guys win
 function playGame(playerArr) {
+  var history = new History();
   var numMissions = missionSizes.length;
   var missionSuccesses = 0;
   var missionFailures = 0;
@@ -70,11 +81,12 @@ function playGame(playerArr) {
   for (var missNum = 0; missNum < numMissions; missNum++) {
     var voteFailures = 0;
     // 1. leader chooses team
-    var myTeam = playerArr[leader].leaderChooseTeam(missNum);
+    var myTeam = playerArr[leader].leaderChooseTeam(history);
     if (myTeam.length !== missionSizes[missNum]) {
       throw new Error("Bad team length "+ JSON.stringify(myTeam));
     }
-    //console.log("Leader " + playerArr[leader] + " chose " + myTeam );
+    
+    console.log("Leader " + playerArr[leader] + " chose " + myTeam );
     // 2. all vote on team
     var numYesVotes = 0;
     var numNoVotes = 0;
@@ -93,13 +105,17 @@ function playGame(playerArr) {
       for (var i=0; i < myTeam.length;i++){
         var player = playerArr[myTeam[i]]; 
         if (!(player.missionPlaySuccess(missNum, myTeam))) {
-          //console.log("Player " +player + " failed mission " + missNum);
+          console.log("Player " +player + " failed mission " + missNum);
           ++failCardsPlayed;
         }
       }
       if (failCardsPlayed > 0){
+        history.missionSuccesses.push(false);
+        history.missionTeams.push(myTeam);
         ++missionFailures;
       } else {
+        history.missionSuccesses.push(true);
+        history.missionTeams.push(myTeam);
         ++missionSuccesses;
       }            
     } else {
@@ -111,10 +127,11 @@ function playGame(playerArr) {
     // Either way, increment leader
     leader = (leader + 1) % (playerArr.length);     
   }
+  console.log("History: " + JSON.stringify(history));
   return (missionSuccesses > missionFailures);
 }
 var wins = 0;
-var games = 100000;
+var games = 1;
 for (var gNum = 0; gNum < games; gNum++) {
   
   players = shuffle(players);
