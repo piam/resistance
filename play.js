@@ -2,7 +2,12 @@ var good = 3;
 var spy = 2;
 var missionSizes = [2,3,2,3,3];
 var maxVoteFails = 5;
-
+var DEBUG = false;
+function log(x) {
+  if (DEBUG) {
+    console.log(x);
+  }
+}
 function History() {
   // missions successes and fails
   this.missionSuccesses = []; // e.g. [true, false];
@@ -25,9 +30,30 @@ function Player(isGood) {
     var size = missionSizes[missNum];
     var team = [];
     var playerIndices = [0, 1, 2, 3, 4];
+    var start = 0;
     team.push(playerIndices.splice(this.playerNum,1)[0]);
-    for (var i = 0; i< size-1; i++){
-      team.push(playerIndices.splice(0,1)[0]);
+
+    if ((isGood) && (missNum >1)){
+      if (history.missionSuccesses[missNum-1]){
+        for (var i = 0; i< size-1; i++){
+        team.push(playerIndices.splice(start,1)[0]);
+      } }
+      else{
+        start = (history.missionTeams[missNum-1][1]+1);
+        start = start % 5;
+        if (start === this.playerNum){
+          start = (start++)%5;
+        }
+        for (var i = 0; i< size-1; i++){
+        team.push(playerIndices.splice(start,1)[0]);
+      }
+      }
+    }
+    
+    else{
+      for (var i = 0; i< size-1; i++){
+        team.push(playerIndices.splice(start,1)[0]);
+      }
     }
     // always choose the first n-1 folks + yourself
         
@@ -86,7 +112,7 @@ function playGame(playerArr) {
       throw new Error("Bad team length "+ JSON.stringify(myTeam));
     }
     
-    console.log("Leader " + playerArr[leader] + " chose " + myTeam );
+    log("Leader " + playerArr[leader] + " chose " + myTeam );
     // 2. all vote on team
     var numYesVotes = 0;
     var numNoVotes = 0;
@@ -105,7 +131,7 @@ function playGame(playerArr) {
       for (var i=0; i < myTeam.length;i++){
         var player = playerArr[myTeam[i]]; 
         if (!(player.missionPlaySuccess(missNum, myTeam))) {
-          console.log("Player " +player + " failed mission " + missNum);
+          log("Player " +player + " failed mission " + missNum);
           ++failCardsPlayed;
         }
       }
@@ -127,11 +153,11 @@ function playGame(playerArr) {
     // Either way, increment leader
     leader = (leader + 1) % (playerArr.length);     
   }
-  console.log("History: " + JSON.stringify(history));
+  log("History: " + JSON.stringify(history));
   return (missionSuccesses > missionFailures);
 }
 var wins = 0;
-var games = 1;
+var games = 100000;
 for (var gNum = 0; gNum < games; gNum++) {
   
   players = shuffle(players);
