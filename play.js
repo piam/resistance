@@ -4,6 +4,7 @@ var missionSizes = [2,3,2,3,3];
 var maxVoteFails = 5;
 
 function Player(isGood) {
+  this.playerNum = 0; // will be changed later
   this.toString = function(){
     return "P" + this.playerNum + ":" + 
       (isGood ? "g" : "e");
@@ -13,10 +14,13 @@ function Player(isGood) {
   this.leaderChooseTeam = function(missNum) {
     var size = missionSizes[missNum];
     var team = [];
-    // always choose the first n folks
-    for (var i = 0; i < size; i++) {
-      team.push(i);
+    var playerIndices = [0, 1, 2, 3, 4];
+    team.push(playerIndices.splice(this.playerNum,1)[0]);
+    for (var i = 0; i< size-1; i++){
+      team.push(playerIndices.splice(0,1)[0]);
     }
+    // always choose the first n-1 folks + yourself
+        
     return team;
   };
   // retrun true or false to approve or disapprove
@@ -67,6 +71,10 @@ function playGame(playerArr) {
     var voteFailures = 0;
     // 1. leader chooses team
     var myTeam = playerArr[leader].leaderChooseTeam(missNum);
+    if (myTeam.length !== missionSizes[missNum]) {
+      throw new Error("Bad team length "+ JSON.stringify(myTeam));
+    }
+    //console.log("Leader " + playerArr[leader] + " chose " + myTeam );
     // 2. all vote on team
     var numYesVotes = 0;
     var numNoVotes = 0;
@@ -85,7 +93,7 @@ function playGame(playerArr) {
       for (var i=0; i < myTeam.length;i++){
         var player = playerArr[myTeam[i]]; 
         if (!(player.missionPlaySuccess(missNum, myTeam))) {
-//          console.log("Player " +player + " failed mission " + missNum);
+          //console.log("Player " +player + " failed mission " + missNum);
           ++failCardsPlayed;
         }
       }
