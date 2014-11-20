@@ -35,6 +35,11 @@ function Player(isGood) {
 
     if ((isGood) && (missNum >1)){
       if (history.missionSuccesses[missNum-1]){
+        start = (history.missionTeams[missNum-1][1]);
+        start = start % 5;
+        if (start === this.playerNum){
+          start = (start++)%5;
+        }      
         for (var i = 0; i< size-1; i++){
         team.push(playerIndices.splice(start,1)[0]);
       } }
@@ -157,7 +162,12 @@ function playGame(playerArr) {
   return (missionSuccesses > missionFailures);
 }
 var wins = 0;
-var games = 100000;
+var games = 10000;
+
+if (DEBUG) {
+  games = 1;
+}
+
 for (var gNum = 0; gNum < games; gNum++) {
   
   players = shuffle(players);
