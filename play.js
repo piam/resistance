@@ -2,7 +2,7 @@ var good = 3;
 var spy = 2;
 var missionSizes = [2,3,2,3,3];
 var maxVoteFails = 5;
-var DEBUG = false;
+var DEBUG = true;
 function log(x) {
   if (DEBUG) {
     console.log(x);
@@ -33,22 +33,24 @@ function Player(isGood) {
     var start = 0;
     team.push(playerIndices.splice(this.playerNum,1)[0]);
 
-    if ((isGood) && (missNum >1)){
+    if ((isGood) && (missNum > 0)){
       if (history.missionSuccesses[missNum-1]){
         start = (history.missionTeams[missNum-1][1]);
         start = start % 5;
-        if (start === this.playerNum){
-          start = (start++)%5;
+        if (start == this.playerNum){
+          start = (start+1)%5;
         }      
         for (var i = 0; i< size-1; i++){
         team.push(playerIndices.splice(start,1)[0]);
       } }
       else{
+        console.log('last start: ' + (history.missionTeams[missNum-1][1]));
         start = (history.missionTeams[missNum-1][1]+1);
         start = start % 5;
         if (start === this.playerNum){
-          start = (start++)%5;
+          start = (start+1)%5;
         }
+        console.log('new start: '+ start);
         for (var i = 0; i< size-1; i++){
         team.push(playerIndices.splice(start,1)[0]);
       }
@@ -116,7 +118,13 @@ function playGame(playerArr) {
     if (myTeam.length !== missionSizes[missNum]) {
       throw new Error("Bad team length "+ JSON.stringify(myTeam));
     }
-    
+    for (var i=0; i< myTeam.length; i++){
+      if (!( (myTeam[i] >= 0) && (myTeam[i] <= 4) )) {
+              throw new Error("Team is not real!" +JSON.stringify(myTeam));
+      }
+    }
+
+
     log("Leader " + playerArr[leader] + " chose " + myTeam );
     // 2. all vote on team
     var numYesVotes = 0;
@@ -170,10 +178,15 @@ if (DEBUG) {
 
 for (var gNum = 0; gNum < games; gNum++) {
   
-  players = shuffle(players);
+  //  players = shuffle(players);
+  players = [new Player(false), new Player(true), new Player(true), new Player(true), new Player(false)];
+
   for (var j = 0; j < players.length; j++) {
     players[j].playerNum = j;
   }
+
+    console.log(players);
+
   var win = playGame(players);
   //console.log("players: " + players + " win? " + win);
 
