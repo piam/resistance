@@ -23,6 +23,7 @@ function Player(isGood) {
     return "P" + this.playerNum + ":" + 
       (isGood ? "g" : "e");
   };
+  
   // return an array of player indices, of
   // apprporiate size
   this.leaderChooseTeam = function(history) {
@@ -31,39 +32,38 @@ function Player(isGood) {
     var team = [];
     var playerIndices = [0, 1, 2, 3, 4];
     var start = 0;
-    team.push(playerIndices.splice(this.playerNum,1)[0]);
 
-    if ((isGood) && (missNum > 0)){
-      if (history.missionSuccesses[missNum-1]){
-        start = (history.missionTeams[missNum-1][1]);
-        start = start % 5;
-        if (start == this.playerNum){
-          start = (start+1)%5;
-        }      
-        for (var i = 0; i< size-1; i++){
-        team.push(playerIndices.splice(start,1)[0]);
-      } }
-      else{
-        console.log('last start: ' + (history.missionTeams[missNum-1][1]));
-        start = (history.missionTeams[missNum-1][1]+1);
-        start = start % 5;
-        if (start === this.playerNum){
-          start = (start+1)%5;
+
+    if ((isGood) && (missNum > 0)) {
+      if (history.missionSuccesses[missNum-1]) {
+        team = history.missionTeams[missNum-1];   
+      } 
+      else { 
+        team.push(this.playerNum);
+        for ( var i=0; i < size - 1; i++) {
+          if (i != this.playerNum) {
+            team.push(i);
+          }
+          else {
+            team.push((i+1)%players.length);
+            i++;
+          }
         }
-        console.log('new start: '+ start);
-        for (var i = 0; i< size-1; i++){
-        team.push(playerIndices.splice(start,1)[0]);
-      }
       }
     }
-    
-    else{
-      for (var i = 0; i< size-1; i++){
-        team.push(playerIndices.splice(start,1)[0]);
+    else if (!(isGood) || (missNum === 0)) {
+      team.push(this.playerNum);
+      for ( var i=0; i < size -1; i++){
+        if (i != this.playerNum) {
+          team.push(i);
+        }
+        else {
+            team.push((i+1)%players.length);
+            i++;
+        }
       }
     }
-    // always choose the first n-1 folks + yourself
-        
+
     return team;
   };
   // retrun true or false to approve or disapprove
