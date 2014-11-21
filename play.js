@@ -33,10 +33,47 @@ function Player(isGood) {
     var playerIndices = [0, 1, 2, 3, 4];
     var start = 0;
 
-
     if ((isGood) && (missNum > 0)) {
       if (history.missionSuccesses[missNum-1]) {
-        team = history.missionTeams[missNum-1];   
+        //grab the last team from the prev mission
+        var prevTeam = history.missionTeams[missNum-1];
+        //if team is bigger remove last element
+        if (prevTeam.length > size) {
+          team = prevTeam.pop();
+        }
+
+        //if team is smaller add yourself, if you are included add another
+        if (prevTeam.length < size) {
+          var onTeam=false;
+          //check for self on team, make array of players not on team
+          for (var i=0; i < prevTeam.length; i++) {
+            //splice out any player found on prevTeam from playerIndices
+            var index = playerIndices.indexOf(prevTeam[i]);
+            playerIndices.splice(index,1);
+
+            if (prevTeam[i]==this.playerNum) {
+              onTeam=true;
+            }
+
+          }
+          //if you are on team add another player
+          if (onTeam){
+            newPlayer = playerIndices[0];
+            team = prevTeam;
+            team.push(newPlayer);
+          }
+          //else add yourself
+          else {
+            team = prevTeam.push(this.playerNum)
+          }
+
+        }
+
+        //if team is same length use it.
+        if (prevTeam.length == size){
+          team = prevTeam;
+        }
+
       } 
       else { 
         team.push(this.playerNum);
@@ -179,7 +216,7 @@ if (DEBUG) {
 for (var gNum = 0; gNum < games; gNum++) {
   
   //  players = shuffle(players);
-  players = [new Player(false), new Player(true), new Player(true), new Player(true), new Player(false)];
+  players = [new Player(true), new Player(true), new Player(false), new Player(true), new Player(false)];
 
   for (var j = 0; j < players.length; j++) {
     players[j].playerNum = j;
