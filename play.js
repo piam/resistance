@@ -2,7 +2,7 @@ var good = 3;
 var spy = 2;
 var missionSizes = [2,3,2,3,3];
 var maxVoteFails = 5;
-var DEBUG = true;
+var DEBUG = false;
 function log(x) {
   if (DEBUG) {
     console.log(x);
@@ -213,21 +213,24 @@ if (DEBUG) {
   games = 1;
 }
 
+// Key is the player array, stringified
+var winRates = {};
+var totals = {};
 for (var gNum = 0; gNum < games; gNum++) {
   
   players = shuffle(players);
-  //players = [new Player(true), new Player(true), new Player(false), new Player(true), new Player(false)];
-
   for (var j = 0; j < players.length; j++) {
     players[j].playerNum = j;
   }
 
-
   var win = playGame(players);
-
-  if (win) wins++;
+  totals[players] = (totals[players]|0) + 1;
+  winRates[players] = (winRates[players]|0) + (win?1:0);
 }
-console.log("good guys win rate " + (wins / games));
+for (var k in winRates) if (winRates.hasOwnProperty(k)) {
+  console.log("WR " + k + " = " + (winRates[k] / totals[k]));
+}
+
 // only win if evil is p3 and p4
 // 2/5 chance of 1e going in slot 5
 // 1/4 chance of 2e going in slot 4
