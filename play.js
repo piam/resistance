@@ -204,7 +204,7 @@ function playGame(playerArr) {
     leader = (leader + 1) % (playerArr.length);     
   }
   log("History: " + JSON.stringify(history));
-  return (missionSuccesses > missionFailures);
+  return {win:(missionSuccesses > missionFailures), missions: history.missionSuccesses};
 }
 var wins = 0;
 var games = 100;
@@ -216,6 +216,7 @@ if (DEBUG) {
 // Key is the player array, stringified
 var winRates = {};
 var totals = {};
+var histories = {};
 for (var gNum = 0; gNum < games; gNum++) {
   
   players = shuffle(players);
@@ -223,13 +224,16 @@ for (var gNum = 0; gNum < games; gNum++) {
     players[j].playerNum = j;
   }
 
-  var win = playGame(players);
+  var result = playGame(players);
   totals[players] = (totals[players]|0) + 1;
-  winRates[players] = (winRates[players]|0) + (win?1:0);
+  if (totals[players] == 1) {
+    histories[players] = result.missions.map(function(x) {return x?"W":"_";});
+  }
+  winRates[players] = (winRates[players]|0) + (result.win?1:0);
 }
 var lines = 0;
 for (var k in winRates) if (winRates.hasOwnProperty(k)) {
-  console.log("WR " + k + " = " + (winRates[k] / totals[k]));
+  console.log("WR " + k + " = " + (winRates[k] / totals[k]) + " : " + histories[k]);
   lines++;
 }
 console.log("Total buckets: " + lines);
