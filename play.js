@@ -43,7 +43,7 @@ function Player(isGood) {
       if (history.missionSucceeded) {
 
         //grab the last team from the prev mission
-        var prevTeam = history.missionTeams[history.largestSuccessTeamIndex];
+        var prevTeam = history.missionTeams[history.largestSuccessTeamIndex].slice();
         
         //if team is bigger remove last element
         if (prevTeam.length > size) {
