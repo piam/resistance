@@ -215,17 +215,15 @@ if (DEBUG) {
 
 for (var gNum = 0; gNum < games; gNum++) {
   
-  //  players = shuffle(players);
-  players = [new Player(true), new Player(true), new Player(false), new Player(true), new Player(false)];
+  players = shuffle(players);
+  //players = [new Player(true), new Player(true), new Player(false), new Player(true), new Player(false)];
 
   for (var j = 0; j < players.length; j++) {
     players[j].playerNum = j;
   }
 
-    console.log(players);
 
   var win = playGame(players);
-  //console.log("players: " + players + " win? " + win);
 
   if (win) wins++;
 }
