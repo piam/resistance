@@ -220,7 +220,7 @@ function playGame(playerArr) {
     leader = (leader + 1) % (playerArr.length);     
   }
   log("History: " + JSON.stringify(history));
-  return {win:(missionSuccesses > missionFailures), missions: history.missionSuccesses};
+  return {win:(missionSuccesses > missionFailures), history: history};
 }
 var wins = 0;
 var games = 100;
@@ -233,6 +233,7 @@ if (DEBUG) {
 var winRates = {};
 var totals = {};
 var histories = {};
+var buckets = 0;
 for (var gNum = 0; gNum < games; gNum++) {
   
   players = shuffle(players);
@@ -243,16 +244,22 @@ for (var gNum = 0; gNum < games; gNum++) {
   var result = playGame(players);
   totals[players] = (totals[players]|0) + 1;
   if (totals[players] == 1) {
-    histories[players] = result.missions.map(function(x) {return x?"W":"_";});
+    var msg = result.win ? "W " : "L ";
+    msg += players;
+    msg += " : ";
+    msg += result.history.missionSuccesses.map(function(x) {return x?"W":"_";});
+    msg += " : ";
+    msg += result.history.missionTeams.join(" ");
+    buckets++;
+    console.log(msg);
   }
-  winRates[players] = (winRates[players]|0) + (result.win?1:0);
+  if (buckets == 10) {
+    break;
+  }
 }
-var lines = 0;
 for (var k in winRates) if (winRates.hasOwnProperty(k)) {
   console.log("WR " + k + " = " + (winRates[k] / totals[k]) + " : " + histories[k]);
-  lines++;
 }
-console.log("Total buckets: " + lines);
 
 // only win if evil is p3 and p4
 // 2/5 chance of 1e going in slot 5
