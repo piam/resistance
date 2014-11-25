@@ -81,15 +81,15 @@ function Player(isGood) {
 
       } 
       else { 
+        //add self to team
         team.push(this.playerNum);
+        // add players after self to team until team full (cycle if needed)
+
         for ( var i=0; i < size - 1; i++) {
-          if (i != this.playerNum) {
-            team.push(i);
-          }
-          else {
-            team.push((i+1)%players.length);
-            i++;
-          }
+            
+            var nextPlayer = (this.playerNum + 1 +i)%(good+spy);            
+            team.push(nextPlayer);                
+          
         }
       }
       
