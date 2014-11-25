@@ -216,10 +216,11 @@ if (DEBUG) {
 }
 
 // Key is the player array, stringified
-var winRates = {};
 var totals = {};
-var histories = {};
 var buckets = 0;
+var wins = 0;
+var keys = [];
+var msgs = {};
 for (var gNum = 0; gNum < games; gNum++) {
   
   players = shuffle(players);
@@ -230,23 +231,30 @@ for (var gNum = 0; gNum < games; gNum++) {
   var result = playGame(players);
   totals[players] = (totals[players]|0) + 1;
   if (totals[players] == 1) {
-    var msg = result.win ? "W " : "L ";
+    var msg = "";
     msg += players;
     msg += " : ";
+    msg += result.win ? "W : " : "L : ";
     msg += result.history.missionSuccesses.map(function(x) {return x?"W":"_";});
     msg += " : ";
     msg += result.history.missionTeams.join(" ");
     buckets++;
-    console.log(msg);
+    var key = "" + players;
+    msgs[key] = msg;
+    keys.push(key);
+    if (result.win) {
+      wins++;
+    }
   }
   if (buckets == 10) {
     break;
   }
 }
-for (var k in winRates) if (winRates.hasOwnProperty(k)) {
-  console.log("WR " + k + " = " + (winRates[k] / totals[k]) + " : " + histories[k]);
+keys.sort();
+for (var i = 0; i < keys.length; i++) {
+  console.log ("#" + i + ": " + msgs[keys[i]]);
 }
-
+console.log("Total wins: " + wins);
 // only win if evil is p3 and p4
 // 2/5 chance of 1e going in slot 5
 // 1/4 chance of 2e going in slot 4
