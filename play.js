@@ -12,6 +12,8 @@ function History() {
   // missions successes and fails
   this.missionSuccesses = []; // e.g. [true, false];
   this.missionTeams = [];
+  this.missionSucceeded = false;
+  this.largestSuccessTeamIndex = null;
   this.currentMissionNum = function() {
     return this.missionSuccesses.length;
   }
@@ -33,10 +35,16 @@ function Player(isGood) {
     var playerIndices = [0, 1, 2, 3, 4];
     var start = 0;
 
+
     if ((isGood) && (missNum > 0)) {
-      if (history.missionSuccesses[missNum-1]) {
+
+
+
+      if (history.missionSucceeded) {
+
         //grab the last team from the prev mission
-        var prevTeam = history.missionTeams[missNum-1];
+        var prevTeam = history.missionTeams[history.largestSuccessTeamIndex];
+        
         //if team is bigger remove last element
         if (prevTeam.length > size) {
           team = prevTeam.pop();
@@ -191,6 +199,14 @@ function playGame(playerArr) {
         ++missionFailures;
       } else {
         history.missionSuccesses.push(true);
+        if (history.missionSucceeded) {
+          if (missionSizes[missNum] > missionSizes[history.largestSuccessTeamIndex])
+            history.largestSuccessTeamIndex = missNum;
+        }
+        else {
+          history.largestSuccessTeamIndex = missNum;
+        }
+        history.missionSucceeded = true;
         history.missionTeams.push(myTeam);
         ++missionSuccesses;
       }            
