@@ -36,11 +36,8 @@ function Player(isGood) {
     var start = 0;
 
 
-    if ((isGood) && (missNum > 0)) {
 
-
-
-      if (history.missionSucceeded) {
+    if (history.missionSucceeded) {
 
         //grab the last team from the prev mission
         var prevTeam = history.missionTeams[history.largestSuccessTeamIndex].slice();
@@ -95,19 +92,8 @@ function Player(isGood) {
           }
         }
       }
-    }
-    else if (!(isGood) || (missNum === 0)) {
-      team.push(this.playerNum);
-      for ( var i=0; i < size -1; i++){
-        if (i != this.playerNum) {
-          team.push(i);
-        }
-        else {
-            team.push((i+1)%players.length);
-            i++;
-        }
-      }
-    }
+      
+ 
 
     return team;
   };
