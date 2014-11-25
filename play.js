@@ -207,7 +207,7 @@ function playGame(playerArr) {
   return (missionSuccesses > missionFailures);
 }
 var wins = 0;
-var games = 10000;
+var games = 100;
 
 if (DEBUG) {
   games = 1;
@@ -227,9 +227,12 @@ for (var gNum = 0; gNum < games; gNum++) {
   totals[players] = (totals[players]|0) + 1;
   winRates[players] = (winRates[players]|0) + (win?1:0);
 }
+var lines = 0;
 for (var k in winRates) if (winRates.hasOwnProperty(k)) {
   console.log("WR " + k + " = " + (winRates[k] / totals[k]));
+  lines++;
 }
+console.log("Total buckets: " + lines);
 
 // only win if evil is p3 and p4
 // 2/5 chance of 1e going in slot 5
